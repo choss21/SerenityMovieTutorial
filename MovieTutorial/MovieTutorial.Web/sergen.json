@@ -1,0 +1,24 @@
+{
+  "RootNamespace": "MovieTutorial",
+  "ServerTypings": {
+    "Assemblies": [],
+    "LocalTexts": true
+  },
+  "Connections": [
+    {
+      "Key": "Default",
+      "Tables": [
+        {
+          "Tablename": "dbo.Movie",
+          "Identifier": "Movie",
+          "Module": "MovieDB",
+          "PermissionKey": "Movie:General"
+        }
+      ]
+    }
+  ],
+  "BaseRowClasses": [],
+  "RemoveForeignFields": [],
+  "CustomGenerate": {},
+  "CustomSettings": {}
+}
