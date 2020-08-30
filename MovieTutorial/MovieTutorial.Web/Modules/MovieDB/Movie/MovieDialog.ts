@@ -13,6 +13,18 @@ namespace MovieTutorial.MovieDB {
         protected getUpdatePermission() { return MovieRow.updatePermission; }
 
         protected form = new MovieForm(this.idPrefix);
-
+        constructor() {
+            super();
+            this.form.Title.element.keyup((e) => {
+                this.form.TitleUpper.value = this.form.Title.value.toUpperCase();
+            });
+            
+        }
+        protected afterLoadEntity(): void {
+            super.afterLoadEntity();
+            if (this.isEditMode()) {
+                this.form.TitleUpper.value = this.form.Title.value.toUpperCase();
+            }             
+        }
     }
 }

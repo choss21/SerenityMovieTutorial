@@ -22,46 +22,52 @@ namespace MovieTutorial.MovieDB.Entities
             set { Fields.MovieId[this] = value; }
         }
 
-        [DisplayName("Title"), Size(200), NotNull, QuickSearch]
+        [DisplayName("Titulo"), Size(200), NotNull, QuickSearch]
         public String Title
         {
             get { return Fields.Title[this]; }
             set { Fields.Title[this] = value; }
         }
 
-        [DisplayName("Description"), Size(1000)]
+        [DisplayName("Descripción"), Size(1000)]
         public String Description
         {
             get { return Fields.Description[this]; }
             set { Fields.Description[this] = value; }
         }
 
-        [DisplayName("Storyline")]
+        [DisplayName("Historia")]
         public String Storyline
         {
             get { return Fields.Storyline[this]; }
             set { Fields.Storyline[this] = value; }
         }
 
-        [DisplayName("Year")]
+        [DisplayName("Año")]
         public Int32? Year
         {
             get { return Fields.Year[this]; }
             set { Fields.Year[this] = value; }
         }
 
-        [DisplayName("Release Date")]
+        [DisplayName("Fecha Lanzamiento")]
         public DateTime? ReleaseDate
         {
             get { return Fields.ReleaseDate[this]; }
             set { Fields.ReleaseDate[this] = value; }
         }
 
-        [DisplayName("Runtime")]
+        [DisplayName("Duracion (Min)")]
         public Int32? Runtime
         {
             get { return Fields.Runtime[this]; }
             set { Fields.Runtime[this] = value; }
+        }
+        [NotMapped]
+        public String TitleUpper
+        {
+            get { return Fields.TitleUpper[this]; }
+            set { Fields.TitleUpper[this] = value; }
         }
 
         IIdField IIdRow.IdField
@@ -90,6 +96,7 @@ namespace MovieTutorial.MovieDB.Entities
             public Int32Field Year;
             public DateTimeField ReleaseDate;
             public Int32Field Runtime;
+            public StringField TitleUpper;
         }
     }
 }

@@ -603,8 +603,9 @@ declare namespace MovieTutorial.MovieDB {
 declare namespace MovieTutorial.MovieDB {
     interface MovieForm {
         Title: Serenity.StringEditor;
-        Description: Serenity.StringEditor;
-        Storyline: Serenity.StringEditor;
+        TitleUpper: Serenity.StringEditor;
+        Description: Serenity.TextAreaEditor;
+        Storyline: Serenity.TextAreaEditor;
         Year: Serenity.IntegerEditor;
         ReleaseDate: Serenity.DateEditor;
         Runtime: Serenity.IntegerEditor;
@@ -624,6 +625,7 @@ declare namespace MovieTutorial.MovieDB {
         Year?: number;
         ReleaseDate?: string;
         Runtime?: number;
+        TitleUpper?: string;
     }
     namespace MovieRow {
         const idProperty = "MovieId";
@@ -640,7 +642,8 @@ declare namespace MovieTutorial.MovieDB {
             Storyline = "Storyline",
             Year = "Year",
             ReleaseDate = "ReleaseDate",
-            Runtime = "Runtime"
+            Runtime = "Runtime",
+            TitleUpper = "TitleUpper"
         }
     }
 }
@@ -1157,6 +1160,8 @@ declare namespace MovieTutorial.MovieDB {
         protected getInsertPermission(): string;
         protected getUpdatePermission(): string;
         protected form: MovieForm;
+        constructor();
+        protected afterLoadEntity(): void;
     }
 }
 declare namespace MovieTutorial.MovieDB {

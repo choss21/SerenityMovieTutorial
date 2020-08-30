@@ -128,7 +128,7 @@
     "Db.Administration.UserPermission.PermissionKey": "Key de Permiso",
     "Db.Administration.UserPermission.User": "Nombre de Usuario para Mostrar",
     "Db.Administration.UserPermission.UserId": "ID de Usuario",
-    "Db.Shared.RecordId": "ID",
+    "Db.Shared.RecordId": "Id",
     "Dialogs.AlertTitle": "Alerta",
     "Dialogs.CancelButton": "Cancelar",
     "Dialogs.ConfirmationTitle": "Confirmar",

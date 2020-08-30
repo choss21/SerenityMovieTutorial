@@ -7,6 +7,7 @@
         Year?: number;
         ReleaseDate?: string;
         Runtime?: number;
+        TitleUpper?: string;
     }
 
     export namespace MovieRow {
@@ -25,7 +26,8 @@
             Storyline = "Storyline",
             Year = "Year",
             ReleaseDate = "ReleaseDate",
-            Runtime = "Runtime"
+            Runtime = "Runtime",
+            TitleUpper = "TitleUpper"
         }
     }
 }

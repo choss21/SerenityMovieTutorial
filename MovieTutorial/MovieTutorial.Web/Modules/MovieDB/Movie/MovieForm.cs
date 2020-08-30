@@ -13,10 +13,17 @@ namespace MovieTutorial.MovieDB.Forms
     [BasedOnRow(typeof(Entities.MovieRow), CheckNames = true)]
     public class MovieForm
     {
+        [DisplayName("Titulo de la pelicula")]
         public String Title { get; set; }
+        [ReadOnly(true)]
+        public String TitleUpper { get; set; }
+        [TextAreaEditor(Rows = 3)]
         public String Description { get; set; }
+        [TextAreaEditor(Rows = 8)]
         public String Storyline { get; set; }
+        [HalfWidth]
         public Int32 Year { get; set; }
+        [HalfWidth]
         public DateTime ReleaseDate { get; set; }
         public Int32 Runtime { get; set; }
     }
