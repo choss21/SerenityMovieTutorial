@@ -17,6 +17,8 @@ namespace MovieTutorial.MovieDB.Forms
         public String Title { get; set; }
         [ReadOnly(true)]
         public String TitleUpper { get; set; }
+        public MovieKind Kind { get; set; }
+        public int GenreId { get; set; }
         [TextAreaEditor(Rows = 3)]
         public String Description { get; set; }
         [TextAreaEditor(Rows = 8)]

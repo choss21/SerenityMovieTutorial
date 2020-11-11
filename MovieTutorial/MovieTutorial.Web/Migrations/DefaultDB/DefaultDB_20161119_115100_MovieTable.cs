@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MovieTutorial.Migrations.DefaultDB
 {
     [Migration(20161119115100)]
-    public class DefaultDB_20161119_115100_MovieTable : Migration
+    public class DefaultDB_20201110_200000_MovieTable : Migration
     {
         public override void Up()
         {

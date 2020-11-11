@@ -7,7 +7,10 @@
         Year?: number;
         ReleaseDate?: string;
         Runtime?: number;
+        Kind?: MovieKind;
         TitleUpper?: string;
+        GenreId?: number;
+        GenreName?: string;
     }
 
     export namespace MovieRow {
@@ -27,7 +30,10 @@
             Year = "Year",
             ReleaseDate = "ReleaseDate",
             Runtime = "Runtime",
-            TitleUpper = "TitleUpper"
+            Kind = "Kind",
+            TitleUpper = "TitleUpper",
+            GenreId = "GenreId",
+            GenreName = "GenreName"
         }
     }
 }

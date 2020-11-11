@@ -9,6 +9,12 @@
       "Key": "Default",
       "Tables": [
         {
+          "Tablename": "dbo.Genre",
+          "Identifier": "Genre",
+          "Module": "MovieDB",
+          "PermissionKey": "Administration:General"
+        },
+        {
           "Tablename": "dbo.Movie",
           "Identifier": "Movie",
           "Module": "MovieDB",

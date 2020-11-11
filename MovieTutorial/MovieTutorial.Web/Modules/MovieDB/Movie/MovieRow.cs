@@ -22,14 +22,14 @@ namespace MovieTutorial.MovieDB.Entities
             set { Fields.MovieId[this] = value; }
         }
 
-        [DisplayName("Titulo"), Size(200), NotNull, QuickSearch]
+        [DisplayName("Titulo"), Size(200), NotNull, QuickSearch(SearchType.Contains)]
         public String Title
         {
             get { return Fields.Title[this]; }
             set { Fields.Title[this] = value; }
         }
 
-        [DisplayName("Descripción"), Size(1000)]
+        [DisplayName("Descripción"), Size(1000), QuickSearch(SearchType.Contains)]
         public String Description
         {
             get { return Fields.Description[this]; }
@@ -43,14 +43,14 @@ namespace MovieTutorial.MovieDB.Entities
             set { Fields.Storyline[this] = value; }
         }
 
-        [DisplayName("Año")]
+        [DisplayName("Año"), QuickSearch(SearchType.Equals, numericOnly: 1)]
         public Int32? Year
         {
             get { return Fields.Year[this]; }
             set { Fields.Year[this] = value; }
         }
 
-        [DisplayName("Fecha Lanzamiento")]
+        [DisplayName("Fecha Lanzamiento"), QuickFilter]
         public DateTime? ReleaseDate
         {
             get { return Fields.ReleaseDate[this]; }
@@ -63,6 +63,30 @@ namespace MovieTutorial.MovieDB.Entities
             get { return Fields.Runtime[this]; }
             set { Fields.Runtime[this] = value; }
         }
+
+        [DisplayName("Tipo"), NotNull, QuickFilter]
+        public MovieKind? Kind
+        {
+            get { return (MovieKind?)Fields.Kind[this]; }
+            set { Fields.Kind[this] = (Int32?)value; }
+        }
+        //                                  NombreTabla  IdVincula con tabla Genre
+        [DisplayName("Genero"), ForeignKey("Genre", "GenreId"), LeftJoin("g")]
+        [LookupEditor(typeof(GenreRow), InplaceAdd = true), QuickFilter]
+        public Int32? GenreId
+        {
+            get { return Fields.GenreId[this]; }
+            set { Fields.GenreId[this] = value; }
+        }
+
+        [DisplayName("Nombre Genero"), Expression("g.Name")]
+        public String GenreName
+        {
+            get { return Fields.GenreName[this]; }
+            set { Fields.GenreName[this] = value; }
+        }
+
+
         [NotMapped]
         public String TitleUpper
         {
@@ -96,7 +120,11 @@ namespace MovieTutorial.MovieDB.Entities
             public Int32Field Year;
             public DateTimeField ReleaseDate;
             public Int32Field Runtime;
+            public Int32Field Kind;
             public StringField TitleUpper;
+
+            public Int32Field GenreId;
+            public StringField GenreName;
         }
     }
 }

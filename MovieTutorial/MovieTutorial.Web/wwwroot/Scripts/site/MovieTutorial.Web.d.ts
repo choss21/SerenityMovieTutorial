@@ -601,9 +601,61 @@ declare namespace MovieTutorial.Membership {
 declare namespace MovieTutorial.MovieDB {
 }
 declare namespace MovieTutorial.MovieDB {
+    interface GenreForm {
+        Name: Serenity.StringEditor;
+    }
+    class GenreForm extends Serenity.PrefixedContext {
+        static formKey: string;
+        private static init;
+        constructor(prefix: string);
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+    interface GenreRow {
+        GenreId?: number;
+        Name?: string;
+    }
+    namespace GenreRow {
+        const idProperty = "GenreId";
+        const nameProperty = "Name";
+        const localTextPrefix = "MovieDB.Genre";
+        const lookupKey = "MovieDB.Genre";
+        function getLookup(): Q.Lookup<GenreRow>;
+        const deletePermission = "Administration:General";
+        const insertPermission = "Administration:General";
+        const readPermission = "Administration:General";
+        const updatePermission = "Administration:General";
+        const enum Fields {
+            GenreId = "GenreId",
+            Name = "Name"
+        }
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+    namespace GenreService {
+        const baseUrl = "MovieDB/Genre";
+        function Create(request: Serenity.SaveRequest<GenreRow>, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function Update(request: Serenity.SaveRequest<GenreRow>, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function Delete(request: Serenity.DeleteRequest, onSuccess?: (response: Serenity.DeleteResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function Retrieve(request: Serenity.RetrieveRequest, onSuccess?: (response: Serenity.RetrieveResponse<GenreRow>) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function List(request: Serenity.ListRequest, onSuccess?: (response: Serenity.ListResponse<GenreRow>) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        const enum Methods {
+            Create = "MovieDB/Genre/Create",
+            Update = "MovieDB/Genre/Update",
+            Delete = "MovieDB/Genre/Delete",
+            Retrieve = "MovieDB/Genre/Retrieve",
+            List = "MovieDB/Genre/List"
+        }
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+}
+declare namespace MovieTutorial.MovieDB {
     interface MovieForm {
         Title: Serenity.StringEditor;
         TitleUpper: Serenity.StringEditor;
+        Kind: Serenity.EnumEditor;
+        GenreId: Serenity.LookupEditor;
         Description: Serenity.TextAreaEditor;
         Storyline: Serenity.TextAreaEditor;
         Year: Serenity.IntegerEditor;
@@ -617,6 +669,13 @@ declare namespace MovieTutorial.MovieDB {
     }
 }
 declare namespace MovieTutorial.MovieDB {
+    enum MovieKind {
+        Film = 1,
+        TvSeries = 2,
+        MiniSeries = 3
+    }
+}
+declare namespace MovieTutorial.MovieDB {
     interface MovieRow {
         MovieId?: number;
         Title?: string;
@@ -625,7 +684,10 @@ declare namespace MovieTutorial.MovieDB {
         Year?: number;
         ReleaseDate?: string;
         Runtime?: number;
+        Kind?: MovieKind;
         TitleUpper?: string;
+        GenreId?: number;
+        GenreName?: string;
     }
     namespace MovieRow {
         const idProperty = "MovieId";
@@ -643,7 +705,10 @@ declare namespace MovieTutorial.MovieDB {
             Year = "Year",
             ReleaseDate = "ReleaseDate",
             Runtime = "Runtime",
-            TitleUpper = "TitleUpper"
+            Kind = "Kind",
+            TitleUpper = "TitleUpper",
+            GenreId = "GenreId",
+            GenreName = "GenreName"
         }
     }
 }
@@ -1150,6 +1215,30 @@ declare namespace MovieTutorial.Membership {
     }
 }
 declare namespace MovieTutorial.MovieDB {
+    class GenreDialog extends Serenity.EntityDialog<GenreRow, any> {
+        protected getFormKey(): string;
+        protected getIdProperty(): string;
+        protected getLocalTextPrefix(): string;
+        protected getNameProperty(): string;
+        protected getService(): string;
+        protected getDeletePermission(): string;
+        protected getInsertPermission(): string;
+        protected getUpdatePermission(): string;
+        protected form: GenreForm;
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+    class GenreGrid extends Serenity.EntityGrid<GenreRow, any> {
+        protected getColumnsKey(): string;
+        protected getDialogType(): typeof GenreDialog;
+        protected getIdProperty(): string;
+        protected getInsertPermission(): string;
+        protected getLocalTextPrefix(): string;
+        protected getService(): string;
+        constructor(container: JQuery);
+    }
+}
+declare namespace MovieTutorial.MovieDB {
     class MovieDialog extends Serenity.EntityDialog<MovieRow, any> {
         protected getFormKey(): string;
         protected getIdProperty(): string;
@@ -1173,5 +1262,6 @@ declare namespace MovieTutorial.MovieDB {
         protected getLocalTextPrefix(): string;
         protected getService(): string;
         constructor(container: JQuery);
+        protected getQuickSearchFields(): Serenity.QuickSearchField[];
     }
 }
