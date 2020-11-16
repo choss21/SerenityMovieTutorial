@@ -22,6 +22,9 @@ namespace MovieTutorial.MovieDB {
                 { name: "Year", title: "Año" }
             ];
         }
-
+        protected getQuickFilters() {
+            debugger;
+            return super.getQuickFilters();
+        }
     }
 }

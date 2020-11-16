@@ -26,7 +26,7 @@ namespace MovieTutorial.MovieDB.Columns
         public String Storyline { get; set; }
         [Width(70)]
         public Int32 Year { get; set; }
-        [DateTimeFormatter(DisplayFormat = "dd/MM/yyyy HH:mm:ss")]
+        [DateTimeFormatter(DisplayFormat = "dd/MM/yyyy")]
         public DateTime ReleaseDate { get; set; }
         [DisplayName("Min")]
         public Int32 Runtime { get; set; }

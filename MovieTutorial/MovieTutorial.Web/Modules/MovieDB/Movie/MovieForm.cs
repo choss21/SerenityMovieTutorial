@@ -8,6 +8,7 @@ namespace MovieTutorial.MovieDB.Forms
     using System.ComponentModel;
     using System.Collections.Generic;
     using System.IO;
+    using MovieTutorial.MovieDB.Entities;
 
     [FormScript("MovieDB.Movie")]
     [BasedOnRow(typeof(Entities.MovieRow), CheckNames = true)]
@@ -18,6 +19,7 @@ namespace MovieTutorial.MovieDB.Forms
         [ReadOnly(true)]
         public String TitleUpper { get; set; }
         public MovieKind Kind { get; set; }
+        [LookupEditor(typeof(GenreRow), InplaceAdd = true)]
         public int GenreId { get; set; }
         [TextAreaEditor(Rows = 3)]
         public String Description { get; set; }

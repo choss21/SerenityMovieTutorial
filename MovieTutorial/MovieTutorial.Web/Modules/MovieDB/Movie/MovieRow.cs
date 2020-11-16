@@ -64,7 +64,7 @@ namespace MovieTutorial.MovieDB.Entities
             set { Fields.Runtime[this] = value; }
         }
 
-        [DisplayName("Tipo"), NotNull, QuickFilter]
+        [DisplayName("Tipo"), NotNull, QuickFilter,QuickFilterOption("multiple","true")]
         public MovieKind? Kind
         {
             get { return (MovieKind?)Fields.Kind[this]; }
@@ -72,7 +72,7 @@ namespace MovieTutorial.MovieDB.Entities
         }
         //                                  NombreTabla  IdVincula con tabla Genre
         [DisplayName("Genero"), ForeignKey("Genre", "GenreId"), LeftJoin("g")]
-        [LookupEditor(typeof(GenreRow), InplaceAdd = true), QuickFilter]
+        [LookupEditor(typeof(GenreRow), InplaceAdd = false), QuickFilter, QuickFilterOption("multiple", "true")]
         public Int32? GenreId
         {
             get { return Fields.GenreId[this]; }
