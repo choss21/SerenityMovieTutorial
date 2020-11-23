@@ -18,6 +18,8 @@ namespace MovieTutorial.MovieDB.Forms
         public String Title { get; set; }
         [ReadOnly(true)]
         public String TitleUpper { get; set; }
+        public int CountryId { get; set; }
+        public int StateCountryId { get; set; }       
         public MovieKind Kind { get; set; }
         [LookupEditor(typeof(GenreRow), InplaceAdd = true)]
         public int GenreId { get; set; }

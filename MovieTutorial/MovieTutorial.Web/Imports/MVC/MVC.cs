@@ -89,6 +89,11 @@ namespace MVC
 
         public static class MovieDB
         {
+            public static class Country
+            {
+                public const string CountryIndex = "~/Modules/MovieDB/Country/CountryIndex.cshtml";
+            }
+
             public static class Genre
             {
                 public const string GenreIndex = "~/Modules/MovieDB/Genre/GenreIndex.cshtml";
@@ -97,6 +102,11 @@ namespace MVC
             public static class Movie
             {
                 public const string MovieIndex = "~/Modules/MovieDB/Movie/MovieIndex.cshtml";
+            }
+
+            public static class StateCountry
+            {
+                public const string StateCountryIndex = "~/Modules/MovieDB/StateCountry/StateCountryIndex.cshtml";
             }
         }
 

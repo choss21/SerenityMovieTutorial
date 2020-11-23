@@ -11,6 +11,10 @@
         TitleUpper?: string;
         GenreId?: number;
         GenreName?: string;
+        CountryId?: number;
+        CountryName?: string;
+        StateCountryId?: number;
+        StateCountryName?: string;
     }
 
     export namespace MovieRow {
@@ -33,7 +37,11 @@
             Kind = "Kind",
             TitleUpper = "TitleUpper",
             GenreId = "GenreId",
-            GenreName = "GenreName"
+            GenreName = "GenreName",
+            CountryId = "CountryId",
+            CountryName = "CountryName",
+            StateCountryId = "StateCountryId",
+            StateCountryName = "StateCountryName"
         }
     }
 }

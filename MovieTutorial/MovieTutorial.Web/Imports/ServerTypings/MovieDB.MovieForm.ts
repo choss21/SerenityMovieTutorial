@@ -2,6 +2,8 @@
     export interface MovieForm {
         Title: Serenity.StringEditor;
         TitleUpper: Serenity.StringEditor;
+        CountryId: Serenity.LookupEditor;
+        StateCountryId: Serenity.LookupEditor;
         Kind: Serenity.EnumEditor;
         GenreId: Serenity.LookupEditor;
         Description: Serenity.TextAreaEditor;
@@ -23,8 +25,8 @@
 
                 var s = Serenity;
                 var w0 = s.StringEditor;
-                var w1 = s.EnumEditor;
-                var w2 = s.LookupEditor;
+                var w1 = s.LookupEditor;
+                var w2 = s.EnumEditor;
                 var w3 = s.TextAreaEditor;
                 var w4 = s.IntegerEditor;
                 var w5 = s.DateEditor;
@@ -32,8 +34,10 @@
                 Q.initFormType(MovieForm, [
                     'Title', w0,
                     'TitleUpper', w0,
-                    'Kind', w1,
-                    'GenreId', w2,
+                    'CountryId', w1,
+                    'StateCountryId', w1,
+                    'Kind', w2,
+                    'GenreId', w1,
                     'Description', w3,
                     'Storyline', w3,
                     'Year', w4,

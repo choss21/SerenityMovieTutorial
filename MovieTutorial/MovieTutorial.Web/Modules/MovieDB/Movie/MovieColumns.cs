@@ -20,6 +20,10 @@ namespace MovieTutorial.MovieDB.Columns
         public MovieKind Kind { get; set; }
         public int GenreId { get; set; }
         public string GenreName { get; set; }
+        [DisplayName("Pais")]
+        public string CountryName { get; set; }
+        [DisplayName("Estado")]
+        public string StateCountryName { get; set; }
 
         [EditLink, Width(300)]
         public String Description { get; set; }
@@ -30,5 +34,9 @@ namespace MovieTutorial.MovieDB.Columns
         public DateTime ReleaseDate { get; set; }
         [DisplayName("Min")]
         public Int32 Runtime { get; set; }
+        [FilterOnly]
+        public Int32 CountryId { get; set; }
+        [FilterOnly]
+        public Int32 StateCountryId { get; set; }
     }
 }

@@ -601,6 +601,56 @@ declare namespace MovieTutorial.Membership {
 declare namespace MovieTutorial.MovieDB {
 }
 declare namespace MovieTutorial.MovieDB {
+    interface CountryForm {
+        Name: Serenity.StringEditor;
+    }
+    class CountryForm extends Serenity.PrefixedContext {
+        static formKey: string;
+        private static init;
+        constructor(prefix: string);
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+    interface CountryRow {
+        CountryId?: number;
+        Name?: string;
+    }
+    namespace CountryRow {
+        const idProperty = "CountryId";
+        const nameProperty = "Name";
+        const localTextPrefix = "MovieDB.Country";
+        const lookupKey = "MovieDB.Country";
+        function getLookup(): Q.Lookup<CountryRow>;
+        const deletePermission = "Administration:General";
+        const insertPermission = "Administration:General";
+        const readPermission = "Administration:General";
+        const updatePermission = "Administration:General";
+        const enum Fields {
+            CountryId = "CountryId",
+            Name = "Name"
+        }
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+    namespace CountryService {
+        const baseUrl = "MovieDB/Country";
+        function Create(request: Serenity.SaveRequest<CountryRow>, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function Update(request: Serenity.SaveRequest<CountryRow>, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function Delete(request: Serenity.DeleteRequest, onSuccess?: (response: Serenity.DeleteResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function Retrieve(request: Serenity.RetrieveRequest, onSuccess?: (response: Serenity.RetrieveResponse<CountryRow>) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function List(request: Serenity.ListRequest, onSuccess?: (response: Serenity.ListResponse<CountryRow>) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        const enum Methods {
+            Create = "MovieDB/Country/Create",
+            Update = "MovieDB/Country/Update",
+            Delete = "MovieDB/Country/Delete",
+            Retrieve = "MovieDB/Country/Retrieve",
+            List = "MovieDB/Country/List"
+        }
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+}
+declare namespace MovieTutorial.MovieDB {
     interface GenreForm {
         Name: Serenity.StringEditor;
     }
@@ -654,6 +704,8 @@ declare namespace MovieTutorial.MovieDB {
     interface MovieForm {
         Title: Serenity.StringEditor;
         TitleUpper: Serenity.StringEditor;
+        CountryId: Serenity.LookupEditor;
+        StateCountryId: Serenity.LookupEditor;
         Kind: Serenity.EnumEditor;
         GenreId: Serenity.LookupEditor;
         Description: Serenity.TextAreaEditor;
@@ -688,6 +740,10 @@ declare namespace MovieTutorial.MovieDB {
         TitleUpper?: string;
         GenreId?: number;
         GenreName?: string;
+        CountryId?: number;
+        CountryName?: string;
+        StateCountryId?: number;
+        StateCountryName?: string;
     }
     namespace MovieRow {
         const idProperty = "MovieId";
@@ -708,7 +764,11 @@ declare namespace MovieTutorial.MovieDB {
             Kind = "Kind",
             TitleUpper = "TitleUpper",
             GenreId = "GenreId",
-            GenreName = "GenreName"
+            GenreName = "GenreName",
+            CountryId = "CountryId",
+            CountryName = "CountryName",
+            StateCountryId = "StateCountryId",
+            StateCountryName = "StateCountryName"
         }
     }
 }
@@ -726,6 +786,61 @@ declare namespace MovieTutorial.MovieDB {
             Delete = "MovieDB/Movie/Delete",
             Retrieve = "MovieDB/Movie/Retrieve",
             List = "MovieDB/Movie/List"
+        }
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+}
+declare namespace MovieTutorial.MovieDB {
+    interface StateCountryForm {
+        Name: Serenity.StringEditor;
+        CountryId: Serenity.LookupEditor;
+    }
+    class StateCountryForm extends Serenity.PrefixedContext {
+        static formKey: string;
+        private static init;
+        constructor(prefix: string);
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+    interface StateCountryRow {
+        StateCountryId?: number;
+        Name?: string;
+        CountryId?: number;
+        CountryName?: string;
+    }
+    namespace StateCountryRow {
+        const idProperty = "StateCountryId";
+        const nameProperty = "Name";
+        const localTextPrefix = "MovieDB.StateCountry";
+        const lookupKey = "MovieDB.StateCountry";
+        function getLookup(): Q.Lookup<StateCountryRow>;
+        const deletePermission = "Administration:General";
+        const insertPermission = "Administration:General";
+        const readPermission = "Administration:General";
+        const updatePermission = "Administration:General";
+        const enum Fields {
+            StateCountryId = "StateCountryId",
+            Name = "Name",
+            CountryId = "CountryId",
+            CountryName = "CountryName"
+        }
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+    namespace StateCountryService {
+        const baseUrl = "MovieDB/StateCountry";
+        function Create(request: Serenity.SaveRequest<StateCountryRow>, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function Update(request: Serenity.SaveRequest<StateCountryRow>, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function Delete(request: Serenity.DeleteRequest, onSuccess?: (response: Serenity.DeleteResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function Retrieve(request: Serenity.RetrieveRequest, onSuccess?: (response: Serenity.RetrieveResponse<StateCountryRow>) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        function List(request: Serenity.ListRequest, onSuccess?: (response: Serenity.ListResponse<StateCountryRow>) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        const enum Methods {
+            Create = "MovieDB/StateCountry/Create",
+            Update = "MovieDB/StateCountry/Update",
+            Delete = "MovieDB/StateCountry/Delete",
+            Retrieve = "MovieDB/StateCountry/Retrieve",
+            List = "MovieDB/StateCountry/List"
         }
     }
 }
@@ -1215,6 +1330,30 @@ declare namespace MovieTutorial.Membership {
     }
 }
 declare namespace MovieTutorial.MovieDB {
+    class CountryDialog extends Serenity.EntityDialog<CountryRow, any> {
+        protected getFormKey(): string;
+        protected getIdProperty(): string;
+        protected getLocalTextPrefix(): string;
+        protected getNameProperty(): string;
+        protected getService(): string;
+        protected getDeletePermission(): string;
+        protected getInsertPermission(): string;
+        protected getUpdatePermission(): string;
+        protected form: CountryForm;
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+    class CountryGrid extends Serenity.EntityGrid<CountryRow, any> {
+        protected getColumnsKey(): string;
+        protected getDialogType(): typeof CountryDialog;
+        protected getIdProperty(): string;
+        protected getInsertPermission(): string;
+        protected getLocalTextPrefix(): string;
+        protected getService(): string;
+        constructor(container: JQuery);
+    }
+}
+declare namespace MovieTutorial.MovieDB {
     class GenreDialog extends Serenity.EntityDialog<GenreRow, any> {
         protected getFormKey(): string;
         protected getIdProperty(): string;
@@ -1264,5 +1403,29 @@ declare namespace MovieTutorial.MovieDB {
         constructor(container: JQuery);
         protected getQuickSearchFields(): Serenity.QuickSearchField[];
         protected getQuickFilters(): Serenity.QuickFilter<Serenity.Widget<any>, any>[];
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+    class StateCountryDialog extends Serenity.EntityDialog<StateCountryRow, any> {
+        protected getFormKey(): string;
+        protected getIdProperty(): string;
+        protected getLocalTextPrefix(): string;
+        protected getNameProperty(): string;
+        protected getService(): string;
+        protected getDeletePermission(): string;
+        protected getInsertPermission(): string;
+        protected getUpdatePermission(): string;
+        protected form: StateCountryForm;
+    }
+}
+declare namespace MovieTutorial.MovieDB {
+    class StateCountryGrid extends Serenity.EntityGrid<StateCountryRow, any> {
+        protected getColumnsKey(): string;
+        protected getDialogType(): typeof StateCountryDialog;
+        protected getIdProperty(): string;
+        protected getInsertPermission(): string;
+        protected getLocalTextPrefix(): string;
+        protected getService(): string;
+        constructor(container: JQuery);
     }
 }

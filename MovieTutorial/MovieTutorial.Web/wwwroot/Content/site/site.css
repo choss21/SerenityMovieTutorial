@@ -8104,3 +8104,15 @@ section.content > .s-DataGrid {
 .s-MovieDB-GenreDialog .caption {
   width: 150px;
 }
+.s-MovieDB-CountryDialog > .size {
+  width: 650px;
+}
+.s-MovieDB-CountryDialog .caption {
+  width: 150px;
+}
+.s-MovieDB-StateCountryDialog > .size {
+  width: 650px;
+}
+.s-MovieDB-StateCountryDialog .caption {
+  width: 150px;
+}

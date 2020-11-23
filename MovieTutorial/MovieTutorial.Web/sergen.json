@@ -9,6 +9,12 @@
       "Key": "Default",
       "Tables": [
         {
+          "Tablename": "dbo.Countries",
+          "Identifier": "Country",
+          "Module": "MovieDB",
+          "PermissionKey": "Administration:General"
+        },
+        {
           "Tablename": "dbo.Genre",
           "Identifier": "Genre",
           "Module": "MovieDB",
@@ -19,6 +25,12 @@
           "Identifier": "Movie",
           "Module": "MovieDB",
           "PermissionKey": "Movie:General"
+        },
+        {
+          "Tablename": "dbo.StatesCountry",
+          "Identifier": "StateCountry",
+          "Module": "MovieDB",
+          "PermissionKey": "Administration:General"
         }
       ]
     }

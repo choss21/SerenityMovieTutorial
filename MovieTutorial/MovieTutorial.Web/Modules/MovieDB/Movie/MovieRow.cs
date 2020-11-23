@@ -64,7 +64,7 @@ namespace MovieTutorial.MovieDB.Entities
             set { Fields.Runtime[this] = value; }
         }
 
-        [DisplayName("Tipo"), NotNull, QuickFilter,QuickFilterOption("multiple","true")]
+        [DisplayName("Tipo"), NotNull, QuickFilter, QuickFilterOption("multiple", "true")]
         public MovieKind? Kind
         {
             get { return (MovieKind?)Fields.Kind[this]; }
@@ -85,6 +85,34 @@ namespace MovieTutorial.MovieDB.Entities
             get { return Fields.GenreName[this]; }
             set { Fields.GenreName[this] = value; }
         }
+        [DisplayName("Pais"), ForeignKey("Countries", "CountryId"), LeftJoin("jCountry")]
+        [LookupEditor(typeof(CountryRow)),QuickFilter]
+        public int? CountryId
+        {
+            get { return Fields.CountryId[this]; }
+            set { Fields.CountryId[this] = value; }
+        }
+        [DisplayName("Nombre Pais"), Expression("jCountry.Name")]
+        public String CountryName
+        {
+            get { return Fields.CountryName[this]; }
+            set { Fields.CountryName[this] = value; }
+        }
+
+        [DisplayName("Estado"), ForeignKey("StatesCountry", "StateCountryId"), LeftJoin("jStateCountry")]
+        [LookupEditor(typeof(StateCountryRow),CascadeFrom ="CountryId", CascadeField ="CountryId"),QuickFilter]
+        public int? StateCountryId
+        {
+            get { return Fields.StateCountryId[this]; }
+            set { Fields.StateCountryId[this] = value; }
+        }
+        [DisplayName("Nombre Estado"), Expression("jStateCountry.Name")]
+        public String StateCountryName
+        {
+            get { return Fields.StateCountryName[this]; }
+            set { Fields.StateCountryName[this] = value; }
+        }
+
 
 
         [NotMapped]
@@ -125,6 +153,12 @@ namespace MovieTutorial.MovieDB.Entities
 
             public Int32Field GenreId;
             public StringField GenreName;
+
+            public Int32Field CountryId;
+            public StringField CountryName;
+
+            public Int32Field StateCountryId;
+            public StringField StateCountryName;
         }
     }
 }
