@@ -40,6 +40,7 @@ namespace MovieTutorial.MovieDB.Endpoints
         [HttpPost]
         public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
+            request.ToString();
             return new MyRepository().List(connection, request);
         }
     }

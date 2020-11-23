@@ -13,7 +13,7 @@ namespace MovieTutorial.MovieDB.Entities
     [DisplayName("Paises"), InstanceName("Country")]
     [ReadPermission("Administration:General")]
     [ModifyPermission("Administration:General")]
-    [LookupScript]
+    //[LookupScript]
     public sealed class CountryRow : Row, IIdRow, INameRow
     {
         [DisplayName("Country Id"), Identity]

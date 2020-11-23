@@ -37,6 +37,7 @@ namespace MovieTutorial.MovieDB.Columns
         [FilterOnly]
         public Int32 CountryId { get; set; }
         [FilterOnly]
+        [QuickFilterOption("cascadeFrom", "CountryId")]
         public Int32 StateCountryId { get; set; }
     }
 }
