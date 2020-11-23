@@ -31,7 +31,7 @@ namespace MovieTutorial.MovieDB.Entities
         }
 
         [DisplayName("Country"), NotNull, ForeignKey("[dbo].[Countries]", "CountryId"), LeftJoin("jCountry"), TextualField("CountryName")]
-        [LookupEditor(typeof(Lookups.CountryLookup)),LookupInclude]
+        [LookupEditor(typeof(CountryRow)),LookupInclude]
         public Int32? CountryId
         {
             get { return Fields.CountryId[this]; }

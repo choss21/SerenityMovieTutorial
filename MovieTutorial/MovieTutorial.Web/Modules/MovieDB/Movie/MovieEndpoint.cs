@@ -40,18 +40,6 @@ namespace MovieTutorial.MovieDB.Endpoints
         [HttpPost]
         public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
-            if (request.EqualityFilter.ContainsKey("CountryId"))
-            {
-                var idCountry = request.EqualityFilter["CountryId"] + "";
-                if (!string.IsNullOrEmpty(idCountry))
-                {
-                    if (idCountry == "-1")//significa que voy a buscar cuando no se selecciona un pais en el registro de movie
-                    {
-                        request.EqualityFilter.Remove("CountryId");
-                        request.Criteria = new Criteria(MyRow.Fields.CountryId.Name).IsNull();
-                    }
-                }
-            }
             return new MyRepository().List(connection, request);
         }
     }

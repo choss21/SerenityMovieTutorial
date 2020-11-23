@@ -1,7 +1,6 @@
 ﻿
 namespace MovieTutorial.MovieDB.Entities
 {
-    using MovieTutorial.MovieDB.Lookups;
     using Serenity;
     using Serenity.ComponentModel;
     using Serenity.Data;
@@ -87,7 +86,7 @@ namespace MovieTutorial.MovieDB.Entities
             set { Fields.GenreName[this] = value; }
         }
         [DisplayName("Pais"), ForeignKey("Countries", "CountryId"), LeftJoin("jCountry")]
-        [LookupEditor(typeof(CountryLookup)),QuickFilter]
+        [LookupEditor(typeof(CountryRow)),QuickFilter]
         public int? CountryId
         {
             get { return Fields.CountryId[this]; }
