@@ -1,13 +1,12 @@
-﻿
+﻿using Microsoft.AspNetCore.Mvc;
+using Serenity.Data;
+using Serenity.Services;
+using System.Data;
+using MyRepository = MovieTutorial.Administration.Repositories.RolePermissionRepository;
+using MyRow = MovieTutorial.Administration.Entities.RolePermissionRow;
+
 namespace MovieTutorial.Administration.Endpoints
 {
-    using Serenity.Data;
-    using Serenity.Services;
-    using System.Data;
-    using Microsoft.AspNetCore.Mvc;
-    using MyRepository = Repositories.RolePermissionRepository;
-    using MyRow = Entities.RolePermissionRow;
-
     [Route("Services/Administration/RolePermission/[action]")]
     [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
     public class RolePermissionController : ServiceEndpoint
@@ -15,12 +14,12 @@ namespace MovieTutorial.Administration.Endpoints
         [HttpPost, AuthorizeUpdate(typeof(MyRow))]
         public SaveResponse Update(IUnitOfWork uow, RolePermissionUpdateRequest request)
         {
-            return new MyRepository().Update(uow, request);
+            return new MyRepository(Context).Update(uow, request);
         }
 
         public RolePermissionListResponse List(IDbConnection connection, RolePermissionListRequest request)
         {
-            return new MyRepository().List(connection, request);
+            return new MyRepository(Context).List(connection, request);
         }
     }
 }

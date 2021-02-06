@@ -1,24 +1,31 @@
-﻿
+﻿using Serenity;
+using Serenity.Data;
+using Serenity.Services;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using MyRow = MovieTutorial.Administration.Entities.RolePermissionRow;
+
 namespace MovieTutorial.Administration.Repositories
 {
-    using Serenity;
-    using Serenity.Data;
-    using Serenity.Services;
-    using System;
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Linq;
-    using MyRow = Entities.RolePermissionRow;
-
-    public class RolePermissionRepository
+    public class RolePermissionRepository : BaseRepository
     {
+        public RolePermissionRepository(IRequestContext context)
+             : base(context)
+        {
+        }
+
         private static MyRow.RowFields fld { get { return MyRow.Fields; } }
 
         public SaveResponse Update(IUnitOfWork uow, RolePermissionUpdateRequest request)
         {
-            Check.NotNull(request, "request");
-            Check.NotNull(request.RoleID, "roleID");
-            Check.NotNull(request.Permissions, "permissions");
+            if (request is null)
+                throw new ArgumentNullException("request");
+            if (request.RoleID is null)
+                throw new ArgumentNullException("roleID");
+            if (request.Permissions is null)
+                throw new ArgumentNullException("permissions");
 
             var roleID = request.RoleID.Value;
             var oldList = new HashSet<string>(
@@ -55,8 +62,8 @@ namespace MovieTutorial.Administration.Repositories
                 });
             }
 
-            BatchGenerationUpdater.OnCommit(uow, fld.GenerationKey);
-            BatchGenerationUpdater.OnCommit(uow, Entities.UserPermissionRow.Fields.GenerationKey);
+            Cache.InvalidateOnCommit(uow, fld);
+            Cache.InvalidateOnCommit(uow, Entities.UserPermissionRow.Fields);
 
             return new SaveResponse();
         }
@@ -87,8 +94,10 @@ namespace MovieTutorial.Administration.Repositories
 
         public RolePermissionListResponse List(IDbConnection connection, RolePermissionListRequest request)
         {
-            Check.NotNull(request, "request");
-            Check.NotNull(request.RoleID, "roleID");
+            if (request is null)
+                throw new ArgumentNullException("request");
+            if (request.RoleID is null)
+                throw new ArgumentNullException("roleID");
 
             string prefix = "";
             string module = request.Module.TrimToEmpty();

@@ -14,16 +14,16 @@ namespace MovieTutorial.MovieDB.Entities
     [ReadPermission("Administration:General")]
     [ModifyPermission("Administration:General")] 
     [LookupScript]
-    public sealed class StateCountryRow : Row, IIdRow, INameRow
+    public sealed class StateCountryRow : Row<StateCountryRow.RowFields>, IIdRow, INameRow
     {
-        [DisplayName("State Country Id"), Identity]
+        [DisplayName("State Country Id"), Identity, IdProperty]
         public Int32? StateCountryId
         {
             get { return Fields.StateCountryId[this]; }
             set { Fields.StateCountryId[this] = value; }
         }
 
-        [DisplayName("Name"), Size(100), NotNull, QuickSearch]
+        [DisplayName("Name"), Size(100), NotNull, QuickSearch, NameProperty]
         public String Name
         {
             get { return Fields.Name[this]; }
@@ -43,22 +43,13 @@ namespace MovieTutorial.MovieDB.Entities
         {
             get { return Fields.CountryName[this]; }
             set { Fields.CountryName[this] = value; }
-        }
-
-        IIdField IIdRow.IdField
-        {
-            get { return Fields.StateCountryId; }
-        }
-
-        StringField INameRow.NameField
-        {
-            get { return Fields.Name; }
-        }
-
-        public static readonly RowFields Fields = new RowFields().Init();
-
+        }
         public StateCountryRow()
-            : base(Fields)
+        {
+        }
+
+        public StateCountryRow(RowFields fields)
+            : base(fields)
         {
         }
 

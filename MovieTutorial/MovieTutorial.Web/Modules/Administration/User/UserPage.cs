@@ -1,9 +1,8 @@
-﻿
+﻿using Microsoft.AspNetCore.Mvc;
+using Serenity.Web;
+
 namespace MovieTutorial.Administration.Pages
 {
-    using Serenity.Web;
-    using Microsoft.AspNetCore.Mvc;
-
     [PageAuthorize(typeof(Entities.UserRow))]
     public class UserController : Controller
     {

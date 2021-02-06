@@ -1,8 +1,7 @@
-﻿
+﻿using System;
+
 namespace MovieTutorial
 {
-    using System;
-
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class ImplicitPermissionAttribute : Attribute
     {

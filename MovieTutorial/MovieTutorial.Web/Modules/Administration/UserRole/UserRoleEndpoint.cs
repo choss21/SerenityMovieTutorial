@@ -1,13 +1,12 @@
-﻿
+﻿using Microsoft.AspNetCore.Mvc;
+using Serenity.Data;
+using Serenity.Services;
+using System.Data;
+using MyRepository = MovieTutorial.Administration.Repositories.UserRoleRepository;
+using MyRow = MovieTutorial.Administration.Entities.UserRoleRow;
+
 namespace MovieTutorial.Administration.Endpoints
 {
-    using Serenity.Data;
-    using Serenity.Services;
-    using System.Data;
-    using Microsoft.AspNetCore.Mvc;
-    using MyRepository = Repositories.UserRoleRepository;
-    using MyRow = Entities.UserRoleRow;
-
     [Route("Services/Administration/UserRole/[action]")]
     [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
     public class UserRoleController : ServiceEndpoint
@@ -15,12 +14,12 @@ namespace MovieTutorial.Administration.Endpoints
         [HttpPost, AuthorizeUpdate(typeof(MyRow))]
         public SaveResponse Update(IUnitOfWork uow, UserRoleUpdateRequest request)
         {
-            return new MyRepository().Update(uow, request);
+            return new MyRepository(Context).Update(uow, request);
         }
 
         public UserRoleListResponse List(IDbConnection connection, UserRoleListRequest request)
         {
-            return new MyRepository().List(connection, request);
+            return new MyRepository(Context).List(connection, request);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace MovieTutorial
             }
         }
 
-        public static ReportTree FromList(IEnumerable<ReportRegistry.Report> reports,
+        public static ReportTree FromList(IEnumerable<ReportRegistry.Report> reports, ITextLocalizer localizer,
             string rootPath = null, string categoryOrder = null)
         {
             if (reports == null)
@@ -71,7 +71,7 @@ namespace MovieTutorial
                     {
                         category = new ReportTree.Category();
                         category.Key = current;
-                        category.Title = ReportRegistry.GetReportCategoryTitle(current);
+                        category.Title = ReportRegistry.GetReportCategoryTitle(current, localizer);
                         categoryByKey[current] = category;
 
                         if (!categoryByKey.ContainsKey(prior))

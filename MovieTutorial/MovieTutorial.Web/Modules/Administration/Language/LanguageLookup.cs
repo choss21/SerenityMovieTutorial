@@ -1,15 +1,15 @@
-﻿
+﻿using MovieTutorial.Administration.Entities;
+using Serenity.ComponentModel;
+using Serenity.Data;
+using Serenity.Web;
+
 namespace MovieTutorial.Administration.Lookups
 {
-    using MovieTutorial.Administration.Entities;
-    using Serenity.ComponentModel;
-    using Serenity.Data;
-    using Serenity.Web;
-
     [LookupScript]
     public sealed class LanguageLookup : RowLookupScript<LanguageRow>
     {
-        public LanguageLookup()
+        public LanguageLookup(ISqlConnections sqlConnections)
+            : base(sqlConnections)
         {
             IdField = LanguageRow.Fields.LanguageId.PropertyName;
             Permission = "*";

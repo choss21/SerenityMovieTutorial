@@ -1,9 +1,8 @@
-﻿
+﻿using Serenity.ComponentModel;
+using System;
+
 namespace MovieTutorial.Administration.Columns
 {
-    using Serenity.ComponentModel;
-    using System;
-
     [ColumnsScript("Administration.User")]
     [BasedOnRow(typeof(Entities.UserRow), CheckNames = true)]
     public class UserColumns

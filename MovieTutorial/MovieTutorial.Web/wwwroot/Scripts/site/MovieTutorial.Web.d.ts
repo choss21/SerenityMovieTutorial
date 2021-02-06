@@ -159,51 +159,6 @@ declare namespace MovieTutorial.Administration {
     }
 }
 declare namespace MovieTutorial.Administration {
-    interface SergenConnection {
-        Key?: string;
-    }
-}
-declare namespace MovieTutorial.Administration {
-    interface SergenGenerateOptions {
-        Row?: boolean;
-        Service?: boolean;
-        UI?: boolean;
-    }
-}
-declare namespace MovieTutorial.Administration {
-    interface SergenGenerateRequest extends Serenity.ServiceRequest {
-        ConnectionKey?: string;
-        Table?: SergenTable;
-        GenerateOptions?: SergenGenerateOptions;
-    }
-}
-declare namespace MovieTutorial.Administration {
-    interface SergenListTablesRequest extends Serenity.ServiceRequest {
-        ConnectionKey?: string;
-    }
-}
-declare namespace MovieTutorial.Administration {
-    namespace SergenService {
-        const baseUrl = "Administration/Sergen";
-        function ListConnections(request: Serenity.ServiceRequest, onSuccess?: (response: Serenity.ListResponse<SergenConnection>) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
-        function ListTables(request: SergenListTablesRequest, onSuccess?: (response: Serenity.ListResponse<SergenTable>) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
-        function Generate(request: SergenGenerateRequest, onSuccess?: (response: Serenity.ServiceResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
-        const enum Methods {
-            ListConnections = "Administration/Sergen/ListConnections",
-            ListTables = "Administration/Sergen/ListTables",
-            Generate = "Administration/Sergen/Generate"
-        }
-    }
-}
-declare namespace MovieTutorial.Administration {
-    interface SergenTable {
-        Tablename?: string;
-        Identifier?: string;
-        Module?: string;
-        PermissionKey?: string;
-    }
-}
-declare namespace MovieTutorial.Administration {
     interface TranslationItem {
         Key?: string;
         SourceText?: string;
@@ -910,12 +865,6 @@ declare namespace MovieTutorial.Administration {
     interface RolePermissionDialogOptions {
         roleID?: number;
         title?: string;
-    }
-}
-declare var Vue: any;
-declare namespace MovieTutorial.Administration {
-    class SergenPanel extends Serenity.Widget<any> {
-        constructor(container: JQuery);
     }
 }
 declare namespace MovieTutorial.Administration {

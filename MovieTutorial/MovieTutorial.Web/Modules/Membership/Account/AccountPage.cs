@@ -1,14 +1,27 @@
-﻿
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using MovieTutorial.Administration;
+using MovieTutorial.Common;
+using Serenity;
+using Serenity.Abstractions;
+using Serenity.Services;
+using System;
+
 namespace MovieTutorial.Membership.Pages
 {
-    using Serenity;
-    using Serenity.Services;
-    using System;
-    using Microsoft.AspNetCore.Mvc;
-
     [Route("Account/[action]")]
     public partial class AccountController : Controller
     {
+        public ITwoLevelCache Cache { get; }
+        public ITextLocalizer Localizer { get; }
+
+        public AccountController(ITwoLevelCache cache, ITextLocalizer localizer)
+        {
+            Cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            Localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
+        }
         public static bool UseAdminLTELoginBox = false;
 
         [HttpGet]
@@ -26,38 +39,53 @@ namespace MovieTutorial.Membership.Pages
         [HttpGet]
         public ActionResult AccessDenied(string returnURL)
         {
-            ViewData["HideLeftNavigation"] = !Authorization.IsLoggedIn;
+            ViewData["HideLeftNavigation"] = !User.IsLoggedIn();
 
             return View(MVC.Views.Errors.AccessDenied, (object)returnURL);
         }
 
         [HttpPost, JsonFilter]
-        public Result<ServiceResponse> Login(LoginRequest request)
+        public Result<ServiceResponse> Login(LoginRequest request,
+            [FromServices] IUserPasswordValidator passwordValidator,
+            [FromServices] IUserRetrieveService userRetriever,
+            [FromServices] IEmailSender emailSender = null)
         {
             return this.ExecuteMethod(() =>
             {
-                request.CheckNotNull();
+                if (request is null)
+                    throw new ArgumentNullException(nameof(request));
 
                 if (string.IsNullOrEmpty(request.Username))
                     throw new ArgumentNullException("username");
 
-                var username = request.Username;
-                if (WebSecurityHelper.Authenticate(ref username, request.Password, false))
-                    return new ServiceResponse();
+                if (passwordValidator is null)
+                    throw new ArgumentNullException(nameof(passwordValidator));
 
-                throw new ValidationError("AuthenticationError", Texts.Validation.AuthenticationError);
+                if (userRetriever is null)
+                    throw new ArgumentNullException(nameof(userRetriever));
+
+                var username = request.Username;
+                var result = passwordValidator.Validate(ref username, request.Password);
+                if (result == PasswordValidationResult.Valid)
+                {
+                    var principal = UserRetrieveService.CreatePrincipal(userRetriever, username, authType: "Password");
+                    HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal)
+                        .GetAwaiter().GetResult();
+                    return new ServiceResponse();
+                }
+
+                throw new ValidationError("AuthenticationError", Texts.Validation.AuthenticationError.ToString(Localizer));
             });
         }
 
         private ActionResult Error(string message)
         {
-            return View(MVC.Views.Errors.ValidationError,
-                new ValidationError(Texts.Validation.InvalidResetToken));
+            return View(MVC.Views.Errors.ValidationError, message);
         }
 
         public ActionResult Signout()
         {
-            WebSecurityHelper.LogOut();
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return new RedirectResult("~/");
         }
     }

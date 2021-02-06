@@ -1,42 +1,10 @@
-{
+﻿{
   "RootNamespace": "MovieTutorial",
   "ServerTypings": {
-    "Assemblies": [],
     "LocalTexts": true
   },
-  "Connections": [
-    {
-      "Key": "Default",
-      "Tables": [
-        {
-          "Tablename": "dbo.Countries",
-          "Identifier": "Country",
-          "Module": "MovieDB",
-          "PermissionKey": "Administration:General"
-        },
-        {
-          "Tablename": "dbo.Genre",
-          "Identifier": "Genre",
-          "Module": "MovieDB",
-          "PermissionKey": "Administration:General"
-        },
-        {
-          "Tablename": "dbo.Movie",
-          "Identifier": "Movie",
-          "Module": "MovieDB",
-          "PermissionKey": "Movie:General"
-        },
-        {
-          "Tablename": "dbo.StatesCountry",
-          "Identifier": "StateCountry",
-          "Module": "MovieDB",
-          "PermissionKey": "Administration:General"
-        }
-      ]
-    }
-  ],
-  "BaseRowClasses": [],
-  "RemoveForeignFields": [],
-  "CustomGenerate": {},
-  "CustomSettings": {}
+  "UpgradeInfo": {
+    "InitialType": "Community",
+    "InitialVersion": "5.0.24.0"
+  }
 }

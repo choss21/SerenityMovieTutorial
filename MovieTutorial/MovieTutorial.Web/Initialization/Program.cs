@@ -16,10 +16,12 @@ namespace MovieTutorial
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.UseStaticWebAssets();
                     webBuilder.UseStartup<Startup>();
                 })
                 .ConfigureAppConfiguration((builderContext, config) =>
                 {
+                    config.AddJsonFile("appsettings.bundles.json");
                     config.AddJsonFile($"appsettings.machine.json", optional: true);
                 });
         }

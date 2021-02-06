@@ -1,10 +1,9 @@
-﻿
+﻿using Serenity.Services;
+using System;
+using System.Collections.Generic;
+
 namespace MovieTutorial.Administration
 {
-    using Serenity.Services;
-    using System;
-    using System.Collections.Generic;
-
     public class UserRoleUpdateRequest : ServiceRequest
     {
         public Int32? UserID { get; set; }

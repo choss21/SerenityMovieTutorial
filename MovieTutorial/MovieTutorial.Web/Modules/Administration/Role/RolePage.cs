@@ -1,8 +1,8 @@
-﻿namespace MovieTutorial.Administration.Pages
-{
-    using Serenity.Web;
-    using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Serenity.Web;
 
+namespace MovieTutorial.Administration.Pages
+{
     [PageAuthorize(typeof(Entities.RoleRow))]
     public class RoleController : Controller
     {

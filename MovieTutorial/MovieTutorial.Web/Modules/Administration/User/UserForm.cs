@@ -1,8 +1,8 @@
-﻿namespace MovieTutorial.Administration.Forms
-{
-    using Serenity.ComponentModel;
-    using System;
+﻿using Serenity.ComponentModel;
+using System;
 
+namespace MovieTutorial.Administration.Forms
+{
     [FormScript("Administration.User")]
     [BasedOnRow(typeof(Entities.UserRow), CheckNames = true)]
     public class UserForm

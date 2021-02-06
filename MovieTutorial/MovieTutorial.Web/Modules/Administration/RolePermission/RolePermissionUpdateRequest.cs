@@ -1,11 +1,10 @@
-﻿
+﻿using Newtonsoft.Json;
+using Serenity.Services;
+using System;
+using System.Collections.Generic;
+
 namespace MovieTutorial.Administration
 {
-    using Newtonsoft.Json;
-    using Serenity.Services;
-    using System;
-    using System.Collections.Generic;
-
     public class RolePermissionUpdateRequest : ServiceRequest
     {
         public Int32? RoleID { get; set; }

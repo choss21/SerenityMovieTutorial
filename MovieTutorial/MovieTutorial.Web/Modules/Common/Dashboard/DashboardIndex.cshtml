@@ -1,4 +1,6 @@
 ﻿@model MovieTutorial.Common.DashboardPageModel
+
+@inject Serenity.ITextLocalizer Localizer
 @{
     ViewData["Title"] = "Dashboard";
     ViewData["PageId"] = "Dashboard";
@@ -10,7 +12,7 @@
 }
 
 @section ContentHeader {
-    <h1>@LocalText.Get("Navigation.Dashboard")<small>@Html.Raw(Texts.Site.Dashboard.ContentDescription)</small></h1>
+    <h1>@Localizer.Get("Navigation.Dashboard")<small>@Html.Raw(Texts.Site.Dashboard.ContentDescription.ToString(Localizer))</small></h1>
 }
 
 <!-- Small boxes (Stat box) -->

@@ -1,8 +1,8 @@
-﻿namespace MovieTutorial
-{
-    using Serenity;
-    using System;
+﻿using Serenity;
+using System;
 
+namespace MovieTutorial
+{
     [Serializable]
     public class UserDefinition : IUserDefinition
     {

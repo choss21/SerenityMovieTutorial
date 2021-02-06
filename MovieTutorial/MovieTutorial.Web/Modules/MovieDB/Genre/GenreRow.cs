@@ -14,36 +14,27 @@ namespace MovieTutorial.MovieDB.Entities
     [ReadPermission("Administration:General")]
     [ModifyPermission("Administration:General")]
     [LookupScript]
-    public sealed class GenreRow : Row, IIdRow, INameRow
+    public sealed class GenreRow : Row<GenreRow.RowFields>, IIdRow, INameRow
     {
-        [DisplayName("Genre Id"), Identity]
+        [DisplayName("Genre Id"), Identity, IdProperty]
         public Int32? GenreId
         {
             get { return Fields.GenreId[this]; }
             set { Fields.GenreId[this] = value; }
         }
 
-        [DisplayName("Nombre"), Size(100), NotNull, QuickSearch]
+        [DisplayName("Nombre"), Size(100), NotNull, QuickSearch, NameProperty]
         public String Name
         {
             get { return Fields.Name[this]; }
             set { Fields.Name[this] = value; }
-        }
-
-        IIdField IIdRow.IdField
-        {
-            get { return Fields.GenreId; }
-        }
-
-        StringField INameRow.NameField
-        {
-            get { return Fields.Name; }
-        }
-
-        public static readonly RowFields Fields = new RowFields().Init();
-
+        }
         public GenreRow()
-            : base(Fields)
+        {
+        }
+
+        public GenreRow(RowFields fields)
+            : base(fields)
         {
         }
 

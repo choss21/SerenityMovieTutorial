@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace MVC
 {
     public static class Views
@@ -14,12 +13,6 @@ namespace MVC
             public static class Role
             {
                 public const string RoleIndex = "~/Modules/Administration/Role/RoleIndex.cshtml";
-            }
-
-            public static class Sergen
-            {
-                public const string SergenError = "~/Modules/Administration/Sergen/SergenError.cshtml";
-                public const string SergenIndex = "~/Modules/Administration/Sergen/SergenIndex.cshtml";
             }
 
             public static class Translation

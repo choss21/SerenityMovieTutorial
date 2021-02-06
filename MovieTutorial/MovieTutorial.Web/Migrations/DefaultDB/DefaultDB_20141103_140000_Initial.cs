@@ -3,7 +3,6 @@ using System;
 
 namespace MovieTutorial.Migrations.DefaultDB
 {
-
     [Migration(20141103140000)]
     public class DefaultDB_20141103_140000_Initial : AutoReversingMigration
     {

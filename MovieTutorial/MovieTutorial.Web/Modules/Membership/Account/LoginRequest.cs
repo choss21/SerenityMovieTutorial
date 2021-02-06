@@ -1,9 +1,8 @@
-﻿
+﻿using Serenity.ComponentModel;
+using Serenity.Services;
+
 namespace MovieTutorial.Membership
 {
-    using Serenity.ComponentModel;
-    using Serenity.Services;
-
     [FormScript("Membership.Login")]
     [BasedOnRow(typeof(Administration.Entities.UserRow), CheckNames = true)]
     public class LoginRequest : ServiceRequest

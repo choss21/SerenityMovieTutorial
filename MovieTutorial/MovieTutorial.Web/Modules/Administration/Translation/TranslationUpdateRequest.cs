@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace MovieTutorial.Administration
 {
-
     public class TranslationUpdateRequest : ServiceRequest
     {
         public string TargetLanguageID { get; set; }

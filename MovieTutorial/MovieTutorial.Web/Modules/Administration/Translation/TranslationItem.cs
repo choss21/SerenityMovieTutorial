@@ -1,9 +1,8 @@
-﻿
+﻿using Serenity.ComponentModel;
+
 
 namespace MovieTutorial.Administration
 {
-    using Serenity.ComponentModel;
-
     [ScriptInclude]
     public class TranslationItem
     {

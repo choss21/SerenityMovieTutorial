@@ -1,24 +1,39 @@
-﻿namespace MovieTutorial
-{
-    using FluentMigrator.Runner.Announcers;
-    using FluentMigrator.Runner.Initialization;
-    using Microsoft.AspNetCore.Hosting;
-    using Serenity.Data;
-    using System;
-    using System.Data.SqlClient;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading;
+﻿using FluentMigrator.Runner;
+using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.DependencyInjection;
+using Serenity.Data;
+using System;
+using System.Data.Common;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
 
-    public static class DataMigrations
+namespace MovieTutorial
+{
+    public class DataMigrations : IDataMigrations
     {
         private static readonly string[] databaseKeys = new[] {
             "Default"
         };
 
-        public static void Initialize()
+        protected ISqlConnections SqlConnections { get; }
+        protected IWebHostEnvironment HostEnvironment { get; }
+
+        public DataMigrations(ISqlConnections sqlConnections, IWebHostEnvironment hostEnvironment)
+        {
+            SqlConnections = sqlConnections ??
+                throw new ArgumentNullException(nameof(sqlConnections));
+            HostEnvironment = hostEnvironment ??
+                throw new ArgumentNullException(nameof(hostEnvironment));
+        }
+
+        public void Initialize()
         {
             foreach (var databaseKey in databaseKeys)
             {
@@ -31,9 +46,11 @@
         /// Automatically creates a database for the template if it doesn't already exists.
         /// You might delete this method to disable auto create functionality.
         /// </summary>
-        private static void EnsureDatabase(string databaseKey)
+        private void EnsureDatabase(string databaseKey)
         {
-            var cs = SqlConnections.GetConnectionString(databaseKey);
+            var cs = SqlConnections.TryGetConnectionString(databaseKey);
+            if (cs == null)
+                throw new ArgumentOutOfRangeException(nameof(databaseKey));
 
             var serverType = cs.Dialect.ServerType;
             bool isSql = serverType.StartsWith("SqlServer", StringComparison.OrdinalIgnoreCase);
@@ -44,12 +61,12 @@
 
             if (isSqlite)
             {
-                var contentRoot = Serenity.Dependency.Resolve<IWebHostEnvironment>().ContentRootPath;
+                var contentRoot = HostEnvironment.ContentRootPath;
                 Directory.CreateDirectory(Path.Combine(contentRoot, "App_Data"));
                 return;
             }
 
-            var cb = cs.ProviderFactory.CreateConnectionStringBuilder();
+            var cb = DbProviderFactories.GetFactory(cs.ProviderName).CreateConnectionStringBuilder();
             cb.ConnectionString = cs.ConnectionString;
 
             if (isFirebird)
@@ -67,7 +84,7 @@
                     return;
                 Directory.CreateDirectory(Path.GetDirectoryName(database));
 
-                using (var fbConnection = SqlConnections.New(cb.ConnectionString, cs.ProviderName))
+                using (var fbConnection = SqlConnections.New(cb.ConnectionString, cs.ProviderName, cs.Dialect))
                 {
                     ((WrappedConnection)fbConnection).ActualConnection.GetType()
                         .GetMethod("CreateDatabase", new Type[] { typeof(string), typeof(bool) })
@@ -92,7 +109,7 @@
             var catalog = cb[catalogKey] as string;
             cb[catalogKey] = null;
 
-            using (var serverConnection = SqlConnections.New(cb.ConnectionString, cs.ProviderName))
+            using (var serverConnection = SqlConnections.New(cb.ConnectionString, cs.ProviderName, cs.Dialect))
             {
                 try
                 {
@@ -144,7 +161,7 @@
                 if (isLocalServer)
                 {
                     string baseDirectory;
-                    var hostingEnvironment = Serenity.Dependency.TryResolve<IWebHostEnvironment>();
+                    var hostingEnvironment = HostEnvironment;
                     if (hostingEnvironment != null)
                         baseDirectory = hostingEnvironment.ContentRootPath;
                     else
@@ -169,15 +186,17 @@
             }
         }
 
-        public static bool SkippedMigrations { get; private set; }
+        public bool SkippedMigrations { get; private set; }
 
-        private static void RunMigrations(string databaseKey)
+        private void RunMigrations(string databaseKey)
         {
-            var cs = SqlConnections.GetConnectionString(databaseKey);
-            var connection = cs.ConnectionString;
+            var cs = SqlConnections.TryGetConnectionString(databaseKey);
+            if (cs == null)
+                throw new ArgumentOutOfRangeException(nameof(databaseKey));
+
 
             string serverType = cs.Dialect.ServerType;
-            bool isSqlServer = serverType.StartsWith("SqlServer", StringComparison.OrdinalIgnoreCase);
+
             bool isOracle = serverType.StartsWith("Oracle", StringComparison.OrdinalIgnoreCase);
             bool isFirebird = serverType.StartsWith("Firebird", StringComparison.OrdinalIgnoreCase);
 
@@ -192,58 +211,59 @@
 
             string databaseType = isOracle ? "OracleManaged" : serverType;
 
-            using (var sw = new StringWriter())
+            var conventionSet = new DefaultConventionSet(defaultSchemaName: null,
+                Path.GetDirectoryName(typeof(DataMigrations).Assembly.Location));
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(lb => lb.AddFluentMigratorConsole())
+                .AddFluentMigratorCore()
+                .AddSingleton<IConventionSet>(conventionSet)
+                .Configure<TypeFilterOptions>(options =>
+                {
+                    options.Namespace = "MovieTutorial.Migrations." + databaseKey + "DB";
+                })
+                .Configure<ProcessorOptions>(options =>
+                {
+                    options.Timeout = TimeSpan.FromSeconds(90);
+                })
+                .ConfigureRunner(builder =>
+                {
+                    if (databaseType == OracleDialect.Instance.ServerType)
+                        builder.AddOracleManaged();
+                    else if (databaseType == SqliteDialect.Instance.ServerType)
+                        builder.AddSQLite();
+                    else if (databaseType == FirebirdDialect.Instance.ServerType)
+                        builder.AddFirebird();
+                    else if (databaseType == MySqlDialect.Instance.ServerType)
+                        builder.AddMySql5();
+                    else if (databaseType == PostgresDialect.Instance.ServerType)
+                        builder.AddPostgres();
+                    else
+                        builder.AddSqlServer();
+
+                    builder.WithGlobalConnectionString(cs.ConnectionString);
+                    builder.WithMigrationsIn(typeof(DataMigrations).Assembly);
+                })
+                .BuildServiceProvider();
+
+            var culture = CultureInfo.CurrentCulture;
+            try
             {
-                Announcer announcer = isOracle || isFirebird ?
-                    new TextWriterAnnouncer(sw) { ShowSql = true } :
-                    new TextWriterWithGoAnnouncer(sw) { ShowSql = true };
+                if (isFirebird)
+                    Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-                var runner = new RunnerContext(announcer)
-                {
-                    Database = databaseType,
-                    Connection = cs.ConnectionString,
-#if COREFX
-                    TargetAssemblies = new[] { typeof(DataMigrations).Assembly },
-#else
-                    Targets = new string[] { typeof(DataMigrations).Assembly.Location },
-#endif
-                    Task = "migrate:up",
-                    WorkingDirectory = Path.GetDirectoryName(typeof(DataMigrations).Assembly.Location),
-                    Namespace = "MovieTutorial.Migrations." + databaseKey + "DB",
-                    Timeout = 90
-                };
-
-                var culture = CultureInfo.CurrentCulture;
-                try
-                {
-                    if (isFirebird)
-                        Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-
-                    new TaskExecutor(runner)
-                    {
-#if COREFX
-                        ConnectionString = cs.ConnectionString
-#endif
-                    }.Execute();
-                }
-                catch (Exception ex)
-                {
-                    var output = sw.ToString().Trim();
-
-                    if (output.StartsWith("/*"))
-                    {
-                        var idx = output.IndexOf("*/");
-                        output = output.Substring(idx + 2);
-                    }
-
-                    throw new Exception("Error executing migration:\r\n" +
-                        output, ex);
-                }
-                finally
-                {
-                    if (isFirebird)
-                        Thread.CurrentThread.CurrentCulture = culture;
-                }
+                using var scope = serviceProvider.CreateScope();
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                runner.MigrateUp();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Error executing migration!", ex);
+            }
+            finally
+            {
+                if (isFirebird)
+                    Thread.CurrentThread.CurrentCulture = culture;
             }
         }
     }

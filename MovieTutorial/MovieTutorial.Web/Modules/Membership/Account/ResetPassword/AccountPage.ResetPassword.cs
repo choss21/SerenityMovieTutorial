@@ -1,21 +1,20 @@
-﻿
+﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Mvc;
+using MovieTutorial.Administration.Entities;
+using MovieTutorial.Administration.Repositories;
+using Serenity;
+using Serenity.Data;
+using Serenity.Services;
+using Serenity.Web.Providers;
+using System;
+using System.IO;
+
 namespace MovieTutorial.Membership.Pages
 {
-    using Administration.Entities;
-    using Administration.Repositories;
-    using Serenity;
-    using Serenity.Data;
-    using Serenity.Services;
-    using Serenity.Web.Providers;
-    using System;
-    using System.IO;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.DataProtection;
-
     public partial class AccountController : Controller
     {
         [HttpGet]
-        public ActionResult ResetPassword(string t)
+        public ActionResult ResetPassword(string t, [FromServices] ISqlConnections sqlConnections)
         {
             int userId;
             try
@@ -28,21 +27,24 @@ namespace MovieTutorial.Membership.Pages
                 {
                     var dt = DateTime.FromBinary(br.ReadInt64());
                     if (dt < DateTime.UtcNow)
-                        return Error(Texts.Validation.InvalidResetToken);
+                        return Error(Texts.Validation.InvalidResetToken.ToString(Localizer));
 
                     userId = br.ReadInt32();
                 }
             }
             catch (Exception)
             {
-                return Error(Texts.Validation.InvalidResetToken);
+                return Error(Texts.Validation.InvalidResetToken.ToString(Localizer));
             }
 
-            using (var connection = SqlConnections.NewFor<UserRow>())
+            if (sqlConnections is null)
+                throw new ArgumentNullException(nameof(sqlConnections));
+
+            using (var connection = sqlConnections.NewFor<UserRow>())
             {
                 var user = connection.TryById<UserRow>(userId);
                 if (user == null)
-                    return Error(Texts.Validation.InvalidResetToken);
+                    return Error(Texts.Validation.InvalidResetToken.ToString(Localizer));
             }
 
             if (UseAdminLTELoginBox)
@@ -53,11 +55,12 @@ namespace MovieTutorial.Membership.Pages
         }
 
         [HttpPost, JsonFilter]
-        public Result<ServiceResponse> ResetPassword(ResetPasswordRequest request)
+        public Result<ServiceResponse> ResetPassword(ResetPasswordRequest request, [FromServices] ISqlConnections sqlConnections)
         {
             return this.InTransaction("Default", uow =>
             {
-                request.CheckNotNull();
+                if (request is null)
+                    throw new ArgumentNullException(nameof(request));
 
                 if (string.IsNullOrEmpty(request.Token))
                     throw new ArgumentNullException("token");
@@ -71,23 +74,26 @@ namespace MovieTutorial.Membership.Pages
                 {
                     var dt = DateTime.FromBinary(br.ReadInt64());
                     if (dt < DateTime.UtcNow)
-                        throw new ValidationError(Texts.Validation.InvalidResetToken);
+                        throw new ValidationError(Texts.Validation.InvalidResetToken.ToString(Localizer));
 
                     userId = br.ReadInt32();
                 }
 
                 UserRow user;
-                using (var connection = SqlConnections.NewFor<UserRow>())
+                if (sqlConnections is null)
+                    throw new ArgumentNullException(nameof(sqlConnections));
+
+                using (var connection = sqlConnections.NewFor<UserRow>())
                 {
                     user = connection.TryById<UserRow>(userId);
                     if (user == null)
-                        throw new ValidationError(Texts.Validation.InvalidResetToken);
+                        throw new ValidationError(Texts.Validation.InvalidResetToken.ToString(Localizer));
                 }
 
                 if (request.ConfirmPassword != request.NewPassword)
-                    throw new ValidationError("PasswordConfirmMismatch", LocalText.Get("Validation.PasswordConfirm"));
+                    throw new ValidationError("PasswordConfirmMismatch", Localizer.Get("Validation.PasswordConfirm"));
 
-                request.NewPassword = UserRepository.ValidatePassword(user.Username, request.NewPassword, false);
+                request.NewPassword = UserRepository.ValidatePassword(request.NewPassword, Localizer);
 
 
                 string salt = null;
@@ -101,7 +107,7 @@ namespace MovieTutorial.Membership.Pages
                     PasswordHash = hash
                 });
 
-                BatchGenerationUpdater.OnCommit(uow, UserRow.Fields.GenerationKey);
+                Cache.InvalidateOnCommit(uow, UserRow.Fields);
 
                 return new ServiceResponse();
             });

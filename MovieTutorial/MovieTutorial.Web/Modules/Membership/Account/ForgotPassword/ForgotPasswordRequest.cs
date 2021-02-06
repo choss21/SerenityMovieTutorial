@@ -1,11 +1,10 @@
-﻿
+﻿using Serenity.ComponentModel;
+using Serenity.Services;
+using System;
+using System.ComponentModel;
+
 namespace MovieTutorial.Membership
 {
-    using Serenity.ComponentModel;
-    using Serenity.Services;
-    using System;
-    using System.ComponentModel;
-
     [FormScript("Membership.ForgotPassword")]
     public class ForgotPasswordRequest : ServiceRequest
     {

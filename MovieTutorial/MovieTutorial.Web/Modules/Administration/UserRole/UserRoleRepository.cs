@@ -1,25 +1,32 @@
-﻿
+﻿using Serenity;
+using Serenity.Data;
+using Serenity.Services;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Reflection;
+using MyRow = MovieTutorial.Administration.Entities.UserRoleRow;
+
 namespace MovieTutorial.Administration.Repositories
 {
-    using Serenity;
-    using Serenity.Data;
-    using Serenity.Services;
-    using System;
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Linq;
-    using System.Reflection;
-    using MyRow = Entities.UserRoleRow;
-
-    public class UserRoleRepository
+    public class UserRoleRepository : BaseRepository
     {
+        public UserRoleRepository(IRequestContext context)
+             : base(context)
+        {
+        }
+
         private static MyRow.RowFields fld { get { return MyRow.Fields; } }
 
         public SaveResponse Update(IUnitOfWork uow, UserRoleUpdateRequest request)
         {
-            Check.NotNull(request, "request");
-            Check.NotNull(request.UserID, "userID");
-            Check.NotNull(request.Roles, "permissions");
+            if (request is null)
+                throw new ArgumentNullException("request");
+            if (request.UserID is null)
+                throw new ArgumentNullException("userID");
+            if (request.Roles is null)
+                throw new ArgumentNullException("permissions");
 
             var userID = request.UserID.Value;
             var oldList = new HashSet<Int32>(
@@ -55,8 +62,8 @@ namespace MovieTutorial.Administration.Repositories
                 });
             }
 
-            BatchGenerationUpdater.OnCommit(uow, fld.GenerationKey);
-            BatchGenerationUpdater.OnCommit(uow, Entities.UserPermissionRow.Fields.GenerationKey);
+            Cache.InvalidateOnCommit(uow, fld);
+            Cache.InvalidateOnCommit(uow, Entities.UserPermissionRow.Fields);
 
             return new SaveResponse();
         }
@@ -72,8 +79,10 @@ namespace MovieTutorial.Administration.Repositories
 
         public UserRoleListResponse List(IDbConnection connection, UserRoleListRequest request)
         {
-            Check.NotNull(request, "request");
-            Check.NotNull(request.UserID, "userID");
+            if (request is null)
+                throw new ArgumentNullException("request");
+            if (request.UserID is null)
+                throw new ArgumentNullException("userID");
 
             var response = new UserRoleListResponse();
 

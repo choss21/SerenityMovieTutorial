@@ -12,7 +12,6 @@ namespace MovieTutorial.AppServices
     {
         private static Dictionary<string, string> TwoLetterToFourLetter = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            { "es","es-MX"},
             { "en", "en-US" },
             { "zh", "zh-CN" },
             { "vi", "vi-VN" },
@@ -36,7 +35,7 @@ namespace MovieTutorial.AppServices
                 }
             }
 
-            return Task.FromResult(new ProviderCultureResult(culture ?? "es-MX", culture ?? "es-MX"));
+            return Task.FromResult(new ProviderCultureResult(culture ?? "en-US", culture ?? "en-US"));
         }
 
         private static List<CultureInfo> supportedCultures;
@@ -44,7 +43,7 @@ namespace MovieTutorial.AppServices
             "de-DE",
             "en-US",
             "en-GB",
-            "es-MX",
+            "es-ES",
             "fa-IR",
             "it-IT",
             "pt-PT",

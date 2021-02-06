@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.30413.136
+VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieTutorial.Web", "MovieTutorial\MovieTutorial.Web\MovieTutorial.Web.csproj", "{E0FCF780-9C35-4FB5-A8F2-A10283FB5FB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieTutorial.Web", "MovieTutorial\MovieTutorial.Web\MovieTutorial.Web.csproj", "{92040F91-A0D9-49C9-B51E-C379767DB907}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E0FCF780-9C35-4FB5-A8F2-A10283FB5FB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E0FCF780-9C35-4FB5-A8F2-A10283FB5FB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E0FCF780-9C35-4FB5-A8F2-A10283FB5FB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E0FCF780-9C35-4FB5-A8F2-A10283FB5FB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92040F91-A0D9-49C9-B51E-C379767DB907}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92040F91-A0D9-49C9-B51E-C379767DB907}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92040F91-A0D9-49C9-B51E-C379767DB907}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92040F91-A0D9-49C9-B51E-C379767DB907}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D6C30C08-98C5-4085-9831-243C0C30D4AB}
+		SolutionGuid = {259588B4-8688-4FB2-B1D6-D4E5BB108276}
 	EndGlobalSection
 EndGlobal

@@ -1,29 +1,38 @@
-﻿
+﻿using Microsoft.Extensions.Caching.Memory;
+using MovieTutorial.Administration.Entities;
+using Serenity;
+using Serenity.Abstractions;
+using Serenity.ComponentModel;
+using Serenity.Data;
+using Serenity.Localization;
+using Serenity.Services;
+using Serenity.Web;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Reflection;
+using MyRow = MovieTutorial.Administration.Entities.UserPermissionRow;
+
 namespace MovieTutorial.Administration.Repositories
 {
-    using Entities;
-    using Serenity;
-    using Serenity.Data;
-    using Serenity.Extensibility;
-    using Serenity.Localization;
-    using Serenity.Services;
-    using Serenity.Web;
-    using System;
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Linq;
-    using System.Reflection;
-    using MyRow = Entities.UserPermissionRow;
-
-    public class UserPermissionRepository
+    public class UserPermissionRepository : BaseRepository
     {
+        public UserPermissionRepository(IRequestContext context)
+             : base(context)
+        {
+        }
+
         private static MyRow.RowFields fld { get { return MyRow.Fields; } }
 
         public SaveResponse Update(IUnitOfWork uow, UserPermissionUpdateRequest request)
         {
-            Check.NotNull(request, "request");
-            Check.NotNull(request.UserID, "userID");
-            Check.NotNull(request.Permissions, "permissions");
+            if (request is null)
+                throw new ArgumentNullException("request");
+            if (request.UserID is null)
+                throw new ArgumentNullException("userID");
+            if (request.Permissions is null)
+                throw new ArgumentNullException("permissions");
 
             var userID = request.UserID.Value;
             var oldList = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -72,7 +81,7 @@ namespace MovieTutorial.Administration.Repositories
                 }
             }
 
-            BatchGenerationUpdater.OnCommit(uow, fld.GenerationKey);
+            Cache.InvalidateOnCommit(uow, fld);
 
             return new SaveResponse();
         }
@@ -103,8 +112,10 @@ namespace MovieTutorial.Administration.Repositories
 
         public ListResponse<UserPermissionRow> List(IDbConnection connection, UserPermissionListRequest request)
         {
-            Check.NotNull(request, "request");
-            Check.NotNull(request.UserID, "userID");
+            if (request is null)
+                throw new ArgumentNullException("request");
+            if (request.UserID is null)
+                throw new ArgumentNullException("userID");
 
             string prefix = "";
             string module = request.Module.TrimToEmpty();
@@ -125,8 +136,10 @@ namespace MovieTutorial.Administration.Repositories
 
         public ListResponse<string> ListRolePermissions(IDbConnection connection, UserPermissionListRequest request)
         {
-            Check.NotNull(request, "request");
-            Check.NotNull(request.UserID, "userID");
+            if (request is null)
+                throw new ArgumentNullException("request");
+            if (request.UserID is null)
+                throw new ArgumentNullException("userID");
 
             string prefix = "";
             var module = request.Module.TrimToEmpty();
@@ -160,10 +173,10 @@ namespace MovieTutorial.Administration.Repositories
             };
         }
 
-        private static readonly string[] emptyPermissions = new string[0];
+        private static readonly string[] emptyPermissions = Array.Empty<string>();
         private static readonly char[] splitChar = new char[] { '|', '&' };
 
-        private string[] SplitPermissions(string permission)
+        private static string[] SplitPermissions(string permission)
         {
             if (string.IsNullOrEmpty(permission))
                 return emptyPermissions;
@@ -171,7 +184,7 @@ namespace MovieTutorial.Administration.Repositories
             return permission.Split(splitChar, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        private void ProcessAttributes<TAttr>(HashSet<string> hash,
+        private static void ProcessAttributes<TAttr>(HashSet<string> hash,
                 MemberInfo member, Func<TAttr, string> getPermission)
             where TAttr : Attribute
         {
@@ -189,8 +202,7 @@ namespace MovieTutorial.Administration.Repositories
             }
         }
 
-#if COREFX
-        private void ProcessAttributes<TAttr>(HashSet<string> hash,
+        private static void ProcessAttributes<TAttr>(HashSet<string> hash,
                 Type member, Func<TAttr, string> getPermission)
             where TAttr : Attribute
         {
@@ -207,102 +219,98 @@ namespace MovieTutorial.Administration.Repositories
                 // GetCustomAttributes might fail before .NET 4.6
             }
         }
-#endif
 
-        public ListResponse<string> ListPermissionKeys()
+        public static IEnumerable<string> ListPermissionKeys(IMemoryCache memoryCache, ITypeSource typeSource)
         {
-            return LocalCache.Get("Administration:PermissionKeys", TimeSpan.Zero, () =>
+            if (typeSource is null)
+                throw new ArgumentNullException(nameof(typeSource));
+
+            return memoryCache.Get("Administration:PermissionKeys", TimeSpan.Zero, () =>
             {
                 var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                result.AddRange(NestedPermissionKeyRegistration.AddNestedPermissions(registry: null));
+                result.AddRange(NestedPermissionKeyRegistration.AddNestedPermissions(registry: null, typeSource));
 
-                foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
+                foreach (var attr in typeSource.GetAssemblyAttributes<PermissionAttributeBase>())
+                    if (!attr.Permission.IsEmptyOrNull())
+                        result.AddRange(SplitPermissions(attr.Permission));
+
+                foreach (var type in typeSource.GetTypes())
                 {
-                    foreach (var attr in assembly.GetCustomAttributes<PermissionAttributeBase>())
-                        if (!attr.Permission.IsEmptyOrNull())
-                            result.AddRange(SplitPermissions(attr.Permission));
+                    ProcessAttributes<PageAuthorizeAttribute>(result, type, x => x.Permission);
+                    ProcessAttributes<PermissionAttributeBase>(result, type, x => x.Permission);
+                    ProcessAttributes<ServiceAuthorizeAttribute>(result, type, x => x.Permission);
 
-                    foreach (var type in assembly.GetTypes())
+                    foreach (var member in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
                     {
-                        ProcessAttributes<PageAuthorizeAttribute>(result, type, x => x.Permission);
-                        ProcessAttributes<PermissionAttributeBase>(result, type, x => x.Permission);
-                        ProcessAttributes<ServiceAuthorizeAttribute>(result, type, x => x.Permission);
-
-                        foreach (var member in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
-                        {
-                            ProcessAttributes<PageAuthorizeAttribute>(result, member, x => x.Permission);
-                            ProcessAttributes<PermissionAttributeBase>(result, member, x => x.Permission);
-                            ProcessAttributes<ServiceAuthorizeAttribute>(result, member, x => x.Permission);
-                        }
-
-                        foreach (var member in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
-                            if (member.GetIndexParameters().Length == 0)
-                                ProcessAttributes<PermissionAttributeBase>(result, member, x => x.Permission);
+                        ProcessAttributes<PageAuthorizeAttribute>(result, member, x => x.Permission);
+                        ProcessAttributes<PermissionAttributeBase>(result, member, x => x.Permission);
+                        ProcessAttributes<ServiceAuthorizeAttribute>(result, member, x => x.Permission);
                     }
+
+                    foreach (var member in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                        if (member.GetIndexParameters().Length == 0)
+                            ProcessAttributes<PermissionAttributeBase>(result, member, x => x.Permission);
                 }
 
                 result.Remove("*");
                 result.Remove("?");
 
-                return new ListResponse<string>
-                {
-                    Entities = new List<string>(result)
-                };
+                return result;
             });
         }
 
-        public Dictionary<string, HashSet<string>> ImplicitPermissions
+        public static IDictionary<string, HashSet<string>> GetImplicitPermissions(IMemoryCache memoryCache,
+            ITypeSource typeSource)
         {
-            get
+            if (memoryCache is null)
+                throw new ArgumentNullException(nameof(memoryCache));
+
+            if (typeSource is null)
+                throw new ArgumentNullException(nameof(typeSource));
+
+            return memoryCache.Get<IDictionary<string, HashSet<string>>>("ImplicitPermissions", TimeSpan.Zero, () =>
             {
-                return LocalCache.Get("ImplicitPermissions", TimeSpan.Zero, () =>
+                var result = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
+                Action<Type> addFrom = null;
+                addFrom = (type) =>
                 {
-                    var result = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-
-                    Action<Type> addFrom = null;
-                    addFrom = (type) =>
+                    foreach (var member in type.GetFields(BindingFlags.Static | BindingFlags.DeclaredOnly |
+                        BindingFlags.Public | BindingFlags.NonPublic))
                     {
-                        foreach (var member in type.GetFields(BindingFlags.Static | BindingFlags.DeclaredOnly |
-                            BindingFlags.Public | BindingFlags.NonPublic))
+                        if (member.FieldType != typeof(String))
+                            continue;
+
+                        var key = member.GetValue(null) as string;
+                        if (key == null)
+                            continue;
+
+                        foreach (var attr in member.GetCustomAttributes<ImplicitPermissionAttribute>())
                         {
-                            if (member.FieldType != typeof(String))
-                                continue;
-
-                            var key = member.GetValue(null) as string;
-                            if (key == null)
-                                continue;
-
-                            foreach (var attr in member.GetCustomAttributes<ImplicitPermissionAttribute>())
+                            HashSet<string> list;
+                            if (!result.TryGetValue(key, out list))
                             {
-                                HashSet<string> list;
-                                if (!result.TryGetValue(key, out list))
-                                {
-                                    list = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                                    result[key] = list;
-                                }
-
-                                list.Add(attr.Value);
+                                list = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                                result[key] = list;
                             }
-                        }
 
-                        foreach (var nested in type.GetNestedTypes(BindingFlags.Public | BindingFlags.DeclaredOnly))
-                            addFrom(nested);
-                    };
-
-                    foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
-                    {
-                        foreach (var type in assembly.GetTypes())
-                        {
-                            var attr = type.GetCustomAttribute<NestedPermissionKeysAttribute>();
-                            if (attr != null)
-                                addFrom(type);
+                            list.Add(attr.Value);
                         }
                     }
 
-                    return result;
-                });
-            }
+                    foreach (var nested in type.GetNestedTypes(BindingFlags.Public | BindingFlags.DeclaredOnly))
+                        addFrom(nested);
+                };
+
+                foreach (var type in typeSource.GetTypesWithAttribute(
+                    typeof(NestedPermissionKeysAttribute)))
+                {
+                    addFrom(type);
+                }
+
+                return result;
+            });
         }
     }
 }

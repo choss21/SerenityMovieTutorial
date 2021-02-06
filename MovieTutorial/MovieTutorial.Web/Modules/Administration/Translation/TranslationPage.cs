@@ -1,9 +1,8 @@
-﻿
+﻿using Microsoft.AspNetCore.Mvc;
+using Serenity.Web;
+
 namespace MovieTutorial.Administration.Pages
 {
-    using Serenity.Web;
-    using Microsoft.AspNetCore.Mvc;
-
     [PageAuthorize(PermissionKeys.Translation)]
     public class TranslationController : Controller
     {

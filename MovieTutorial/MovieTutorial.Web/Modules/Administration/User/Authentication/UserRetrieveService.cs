@@ -1,19 +1,30 @@
-﻿namespace MovieTutorial.Administration
-{
-    using Serenity;
-    using Serenity.Abstractions;
-    using Serenity.Data;
-    using System;
-    using System.Data;
-    using MyRow = Entities.UserRow;
+﻿using Serenity;
+using Serenity.Abstractions;
+using Serenity.Data;
+using System;
+using System.Data;
+using System.Security.Claims;
+using System.Security.Principal;
+using MyRow = MovieTutorial.Administration.Entities.UserRow;
 
+namespace MovieTutorial.Administration
+{
     public class UserRetrieveService : IUserRetrieveService
     {
         private static MyRow.RowFields fld { get { return MyRow.Fields; } }
 
-        private UserDefinition GetFirst(IDbConnection connection, BaseCriteria criteria)
+        protected ITwoLevelCache Cache { get; }
+        protected ISqlConnections SqlConnections { get; }
+
+        public UserRetrieveService(ITwoLevelCache cache, ISqlConnections sqlConnections)
         {
-            var user = connection.TrySingle<Entities.UserRow>(criteria);
+            Cache = cache;
+            SqlConnections = sqlConnections;
+        }
+
+        private static UserDefinition GetFirst(IDbConnection connection, BaseCriteria criteria)
+        {
+            var user = connection.TrySingle<MyRow>(criteria);
             if (user != null)
                 return new UserDefinition
                 {
@@ -35,10 +46,10 @@
 
         public IUserDefinition ById(string id)
         {
-            return TwoLevelCache.Get<UserDefinition>("UserByID_" + id, TimeSpan.Zero, TimeSpan.FromDays(1), fld.GenerationKey, () =>
+            return Cache.Get("UserByID_" + id, TimeSpan.Zero, TimeSpan.FromDays(1), fld.GenerationKey, () =>
             {
-                using (var connection = SqlConnections.NewByKey("Default"))
-                    return GetFirst(connection, new Criteria(fld.UserId) == Int32.Parse(id));
+                using var connection = SqlConnections.NewByKey("Default");
+                return GetFirst(connection, new Criteria(fld.UserId) == int.Parse(id));
             });
         }
 
@@ -47,21 +58,43 @@
             if (username.IsEmptyOrNull())
                 return null;
 
-            return TwoLevelCache.Get<UserDefinition>("UserByName_" + username.ToLowerInvariant(),
+            return Cache.Get("UserByName_" + username.ToLowerInvariant(),
                 TimeSpan.Zero, TimeSpan.FromDays(1), fld.GenerationKey, () =>
             {
-                using (var connection = SqlConnections.NewByKey("Default"))
-                    return GetFirst(connection, new Criteria(fld.Username) == username);
+                using var connection = SqlConnections.NewByKey("Default");
+                return GetFirst(connection, new Criteria(fld.Username) == username);
             });
         }
 
-        public static void RemoveCachedUser(int? userId, string username)
+        public static void RemoveCachedUser(ITwoLevelCache cache, int? userId, string username)
         {
             if (userId != null)
-                TwoLevelCache.Remove("UserByID_" + userId);
+                cache.Remove("UserByID_" + userId);
 
             if (username != null)
-                TwoLevelCache.Remove("UserByName_" + username.ToLowerInvariant());
+                cache.Remove("UserByName_" + username.ToLowerInvariant());
+        }
+
+        public static ClaimsPrincipal CreatePrincipal(IUserRetrieveService userRetriever, string username,
+            string authType)
+        {
+            if (userRetriever is null)
+                throw new ArgumentNullException(nameof(userRetriever));
+
+            if (username is null)
+                throw new ArgumentNullException(nameof(username));
+
+            var user = userRetriever.ByUsername(username);
+            if (user == null)
+                throw new ArgumentOutOfRangeException(nameof(username));
+
+            if (authType == null)
+                throw new ArgumentNullException(nameof(authType));
+
+            var identity = new GenericIdentity(username, authType);
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
+
+            return new ClaimsPrincipal(identity);
         }
     }
 }

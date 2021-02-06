@@ -1,54 +1,45 @@
-﻿
+﻿using Serenity.ComponentModel;
+using Serenity.Data;
+using Serenity.Data.Mapping;
+using System;
+using System.ComponentModel;
+
 namespace MovieTutorial.Administration.Entities
 {
-    using Serenity.ComponentModel;
-    using Serenity.Data;
-    using Serenity.Data.Mapping;
-    using System;
-    using System.ComponentModel;
-
     [ConnectionKey("Default"), Module("Administration"), TableName("Languages")]
     [DisplayName("Languages"), InstanceName("Language")]
     [ReadPermission(PermissionKeys.Translation)]
     [ModifyPermission(PermissionKeys.Translation)]
     [LookupScript(typeof(Lookups.LanguageLookup))]
-    public sealed class LanguageRow : Row, IIdRow, INameRow
+    public sealed class LanguageRow : Row<LanguageRow.RowFields>, IIdRow, INameRow
     {
-        [DisplayName("Id"), Identity]
+        [DisplayName("Id"), Identity, IdProperty]
         public Int32? Id
         {
-            get { return Fields.Id[this]; }
-            set { Fields.Id[this] = value; }
+            get => fields.Id[this];
+            set => fields.Id[this] = value;
         }
 
         [DisplayName("Language Id"), Size(10), NotNull, QuickSearch]
         public String LanguageId
         {
-            get { return Fields.LanguageId[this]; }
-            set { Fields.LanguageId[this] = value; }
+            get => fields.LanguageId[this];
+            set => fields.LanguageId[this] = value;
         }
 
-        [DisplayName("Language Name"), Size(50), NotNull, QuickSearch]
+        [DisplayName("Language Name"), Size(50), NotNull, QuickSearch, NameProperty]
         public String LanguageName
         {
-            get { return Fields.LanguageName[this]; }
-            set { Fields.LanguageName[this] = value; }
+            get => fields.LanguageName[this];
+            set => fields.LanguageName[this] = value;
         }
-
-        IIdField IIdRow.IdField
-        {
-            get { return Fields.Id; }
-        }
-
-        StringField INameRow.NameField
-        {
-            get { return Fields.LanguageName; }
-        }
-
-        public static readonly RowFields Fields = new RowFields().Init();
 
         public LanguageRow()
-            : base(Fields)
+        {
+        }
+
+        public LanguageRow(RowFields fields)
+            : base(fields)
         {
         }
 

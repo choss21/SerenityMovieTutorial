@@ -1,5 +1,6 @@
-﻿@{
-    ViewData["Title"] = Serenity.LocalText.Get("Db.MovieDB.StateCountry.EntityPlural");
+﻿@inject Serenity.ITextLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer.Get("Db.MovieDB.StateCountry.EntityPlural");
 }
 
 <div id="GridDiv"></div>

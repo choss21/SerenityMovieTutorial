@@ -13,16 +13,16 @@ namespace MovieTutorial.MovieDB.Entities
     [DisplayName("Peliculas"), InstanceName("Pelicula")]
     [ReadPermission("Movie:General")]
     [ModifyPermission("Movie:General")]
-    public sealed class MovieRow : Row, IIdRow, INameRow
+    public sealed class MovieRow : Row<MovieRow.RowFields>, IIdRow, INameRow
     {
-        [DisplayName("Movie Id"), Identity]
+        [DisplayName("Movie Id"), Identity, IdProperty]
         public Int32? MovieId
         {
             get { return Fields.MovieId[this]; }
             set { Fields.MovieId[this] = value; }
         }
 
-        [DisplayName("Titulo"), Size(200), NotNull, QuickSearch(SearchType.Contains)]
+        [DisplayName("Titulo"), Size(200), NotNull, QuickSearch(SearchType.Contains), NameProperty]
         public String Title
         {
             get { return Fields.Title[this]; }
@@ -120,22 +120,13 @@ namespace MovieTutorial.MovieDB.Entities
         {
             get { return Fields.TitleUpper[this]; }
             set { Fields.TitleUpper[this] = value; }
-        }
-
-        IIdField IIdRow.IdField
-        {
-            get { return Fields.MovieId; }
-        }
-
-        StringField INameRow.NameField
-        {
-            get { return Fields.Title; }
-        }
-
-        public static readonly RowFields Fields = new RowFields().Init();
-
+        }
         public MovieRow()
-            : base(Fields)
+        {
+        }
+
+        public MovieRow(RowFields fields)
+            : base(fields)
         {
         }
 
